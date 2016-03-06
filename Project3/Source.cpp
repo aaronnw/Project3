@@ -40,6 +40,7 @@ public:
 	//All	required	methods	
 	Cell(); //Default constructor
 	Cell(DT* v, Cell<DT>* r);//Initializer
+	Cell(DT* v, int i);//Initializer
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
 	void operator= (const Cell<DT>& c);//Overloaded assignment operator
@@ -60,6 +61,7 @@ public:
 	CellNode(DT1* i, Cell<DT2>* c);//Initializer
 	CellNode(const CellNode<DT1, DT2>& cn);//Copy constructor
 	~CellNode();//Destructor
+	Cell<DT2>* getFirstCell();
 	void operator= (const CellNode<DT1, DT2>& c);//Overloaded assignment operator
 };
 
@@ -218,6 +220,12 @@ Cell<DT>::Cell(DT* v, Cell<DT>* r) {
 }
 
 template<class DT>
+Cell<DT>::Cell(DT * v, int i) {
+	_right = nullptr;
+	_value = v;
+}
+
+template<class DT>
 Cell<DT>::Cell(const Cell<DT>& c) {
 	_value = *c._value;
 	_right = *c._right;
@@ -229,8 +237,8 @@ Cell<DT>::~Cell() {
 
 template<class DT>
 void Cell<DT>::operator=(const Cell<DT>& c) {
-	_value = *c._value;
-	_right = *c._right;
+	_value = c._value;
+	_right = c._right;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -256,12 +264,18 @@ CellNode<DT1, DT2>::CellNode(const CellNode<DT1, DT2>& cn) {
 template<class DT1, class DT2>
 CellNode<DT1, DT2>::~CellNode() {
 }
+
+template<class DT1, class DT2>
+Cell<DT2>* CellNode<DT1, DT2>::getFirstCell() {
+	return _myCell;
+}
 ///Overloaded assignment operator
 template<class DT1, class DT2>
 void CellNode<DT1, DT2>::operator=(const CellNode<DT1, DT2>& cn) {
-	_info = *cn.info;
-	_myCell = *cn._myCell;
+	_info = cn._info;
+	_myCell = cn._myCell;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //Master Cell Methods
@@ -272,12 +286,13 @@ MasterCell<DT1, DT2>::MasterCell() {
 
 template<class DT1, class DT2>
 MasterCell<DT1, DT2>::MasterCell(CellNode<DT1, DT2>* cn) {
+	_myCellNodes = *cn.getFirstCell();
 }
 
 template<class DT1, class DT2>
 MasterCell<DT1, DT2>::MasterCell(const MasterCell<DT1, DT2>& mc) {
+	_myCellNodes = *mc._myCellNodes;
 }
-
 template<class DT1, class DT2>
 MasterCell<DT1, DT2>::~MasterCell() {
 }
@@ -314,12 +329,13 @@ int main() {
 	char comma = ',';
 	int noItems;
 	char c;
-	int counter;
 	vector<char> value;
-	Cell<vector<char>> newCell;
-	CellNode<int, vector<char>> newCellNode;
+	vector<vector<char>> valueList;
+	Cell<vector<char>> cell;
+	Cell<vector<char>>* cellPointer;
+	CellNode<int, vector<char>> cellNode;
+	CellNode<int, Cell<vector<char>>> masterCell;
 	while (!cin.eof()) {
-		counter = 0;
 		//Read in the first values
 		cin >> info;
 		cin.get(comma);
@@ -328,23 +344,31 @@ int main() {
 		cin.get(blank);
 		//Read in the values
 		do {
+			value.empty();
 			cin.get(c);
+			//While there is a valid character read it in
 			while ((c != ' ') && (c != '\n') && (!cin.eof())) {
 				value.add(c);
 				cin.get(c);
 			}
-			if ((c == ' ') && value.getSize >= 1) {
-				//Create a new cell and add it to a cell node
-				newCell = Cell<vector<char>>(&value, );
-				newCellNode = CellNode<int, vector<char>>(&noItems, &newCell);
-			}
-			else if ((c == '\n') || (cin.eof())) {
-				//Add the cell node to the master cell
+			//If there is a space and a value has been read
+			if (value.getSize() >= 1) {
+				valueList.add(value);
 			}
 		} while ((c != '\n') && (!cin.eof()));
-		
+		//End of line
+		//Create a cell node
+		cell = Cell<vector<char>>(&valueList[noItems - 1], 0);
+		cellPointer = &cell;
+		for (int i = noItems-2; i >= 0; i--) {
+			cell = Cell<vector<char>>(&valueList[i], cellPointer);
+			cellPointer = &cell;
+		}
+		cellNode = CellNode<int, vector<char>>(&info, cellPointer);
 	}
-	cout << info << comma << " " << noItems << ' ' << newCell << endl;
+	//End of file
+	//Create a master cell
+//	cout << valueList[0] << ' ' << valueList[1] << ' ' << valueList[2] << ' ' << valueList[3] << ' ' << endl;
 	return 0;
 }
 
