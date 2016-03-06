@@ -39,7 +39,7 @@ protected:
 public:
 	//All	required	methods	
 	Cell(); //Default constructor
-	Cell(DT* v);//Initializer
+	Cell(DT* v, Cell<DT>* r);//Initializer
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
 	void operator= (const Cell<DT>& c);//Overloaded assignment operator
@@ -57,7 +57,7 @@ protected:
 public:
 	//All	required	methods	
 	CellNode();//Default constructor
-	CellNode(DT1* i);//Initializer
+	CellNode(DT1* i, Cell<DT2>* c);//Initializer
 	CellNode(const CellNode<DT1, DT2>& cn);//Copy constructor
 	~CellNode();//Destructor
 	void operator= (const CellNode<DT1, DT2>& c);//Overloaded assignment operator
@@ -212,8 +212,9 @@ Cell<DT>::Cell() {
 }
 
 template<class DT>
-Cell<DT>::Cell(DT * v) {
+Cell<DT>::Cell(DT* v, Cell<DT>* r) {
 	_value = v;
+	_right = r;
 }
 
 template<class DT>
@@ -228,31 +229,38 @@ Cell<DT>::~Cell() {
 
 template<class DT>
 void Cell<DT>::operator=(const Cell<DT>& c) {
-	_value = c._value;
-	_right = c._right;
+	_value = *c._value;
+	_right = *c._right;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //Cell Node Methods
 
+///Default constructor
 template<class DT1, class DT2>
 CellNode<DT1, DT2>::CellNode() {
 }
-
+///Initializer
 template<class DT1, class DT2>
-CellNode<DT1, DT2>::CellNode(DT1 * i) {
+CellNode<DT1, DT2>::CellNode(DT1* i, Cell<DT2>* c) {
+	_info = i;
+	_myCell = c;
 }
-
+///Copy constructor
 template<class DT1, class DT2>
 CellNode<DT1, DT2>::CellNode(const CellNode<DT1, DT2>& cn) {
+	_info = *cn.info;
+	_myCell = *cn._myCell;
 }
-
+///Destructor
 template<class DT1, class DT2>
 CellNode<DT1, DT2>::~CellNode() {
 }
-
+///Overloaded assignment operator
 template<class DT1, class DT2>
-void CellNode<DT1, DT2>::operator=(const CellNode<DT1, DT2>& c) {
+void CellNode<DT1, DT2>::operator=(const CellNode<DT1, DT2>& cn) {
+	_info = *cn.info;
+	_myCell = *cn._myCell;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -306,9 +314,12 @@ int main() {
 	char comma = ',';
 	int noItems;
 	char c;
+	int counter;
 	vector<char> value;
 	Cell<vector<char>> newCell;
+	CellNode<int, vector<char>> newCellNode;
 	while (!cin.eof()) {
+		counter = 0;
 		//Read in the first values
 		cin >> info;
 		cin.get(comma);
@@ -318,15 +329,17 @@ int main() {
 		//Read in the values
 		do {
 			cin.get(c);
-			if ((c != ' ') && (c != '\n') && (!cin.eof())) {
-				while ((c != ' ') && (c != '\n') && (!cin.eof())) {
-					value.add(c);
-					cin.get(c);
-				}
-				newCell = Cell<vector<char>>(&value);
+			while ((c != ' ') && (c != '\n') && (!cin.eof())) {
+				value.add(c);
+				cin.get(c);
 			}
-			if (c == ' ') {
-
+			if ((c == ' ') && value.getSize >= 1) {
+				//Create a new cell and add it to a cell node
+				newCell = Cell<vector<char>>(&value, );
+				newCellNode = CellNode<int, vector<char>>(&noItems, &newCell);
+			}
+			else if ((c == '\n') || (cin.eof())) {
+				//Add the cell node to the master cell
 			}
 		} while ((c != '\n') && (!cin.eof()));
 		
