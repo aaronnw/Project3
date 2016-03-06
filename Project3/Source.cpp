@@ -386,6 +386,7 @@ int main() {
 		for (int i = noItems - 2; i >= 0; i--) {
 			Cell<vector<char>>* cell = new Cell<vector<char>>(&valueList[i], cellPointer);
 			cellPointer = cell;
+
 		}
 		CellNode<int, vector<char>>* cellNode = new CellNode<int, vector<char>>(&info, cellPointer);
 		cellNodeList.add(*cellNode);
