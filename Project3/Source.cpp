@@ -18,6 +18,7 @@ public:
 	~vector(); // Destructor
 	void operator= (const vector<DT>& ac); //Overloaded assignment operator
 	DT& operator[](int i);
+	DT* toArray();
 	void add(DT& x);
 	void insertAt(int i, DT& x);
 	void removeAt(int i);
@@ -44,6 +45,7 @@ public:
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
 	void operator= (const Cell<DT>& c);//Overloaded assignment operator
+	Cell<DT>* getRight();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +64,7 @@ public:
 	CellNode(const CellNode<DT1, DT2>& cn);//Copy constructor
 	~CellNode();//Destructor
 	Cell<DT2>* getFirstCell();
+	DT1* getInfo();
 	void operator= (const CellNode<DT1, DT2>& c);//Overloaded assignment operator
 };
 
@@ -129,6 +132,10 @@ template<class DT>
 DT & vector<DT>::operator[](int i) {
 	//TODO if ((i < 0) || (i >= (capacity - 1))) throw errors;
 	return arrayOfDT[i];
+}
+template<class DT>
+DT * vector<DT>::toArray() {
+	return arrayOfDT;
 }
 ///Add an element to the end of the array
 template<class DT>
@@ -241,6 +248,11 @@ void Cell<DT>::operator=(const Cell<DT>& c) {
 	_right = c._right;
 }
 
+template<class DT>
+Cell<DT>* Cell<DT>::getRight() {
+	return _right;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Cell Node Methods
 
@@ -269,6 +281,10 @@ template<class DT1, class DT2>
 Cell<DT2>* CellNode<DT1, DT2>::getFirstCell() {
 	return _myCell;
 }
+template<class DT1, class DT2>
+DT1 * CellNode<DT1, DT2>::getInfo() {
+	return _info;
+}
 ///Overloaded assignment operator
 template<class DT1, class DT2>
 void CellNode<DT1, DT2>::operator=(const CellNode<DT1, DT2>& cn) {
@@ -286,7 +302,7 @@ MasterCell<DT1, DT2>::MasterCell() {
 
 template<class DT1, class DT2>
 MasterCell<DT1, DT2>::MasterCell(CellNode<DT1, DT2>* cn) {
-	_myCellNodes = *cn.getFirstCell();
+	_myCellNodes = cn;
 }
 
 template<class DT1, class DT2>
@@ -312,8 +328,9 @@ ostream& operator<< (ostream& s, Cell<T>& c) {
 }
 template<class T1, class T2>
 ostream& operator<< (ostream& s, CellNode<T1, T2>& cn) {
+	s << *cn.getInfo() << ', ';
+	s << *cn.getFirstCell();
 	return s;
-
 }
 template<class T1, class T2>
 ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc) {
@@ -329,13 +346,15 @@ int main() {
 	char comma = ',';
 	int noItems;
 	char c;
+	int count = 0;
 	vector<char> value;
 	vector<vector<char>> valueList;
 	Cell<vector<char>> cell;
-	Cell<vector<char>>* cellPointer;
+	Cell<vector<char>>* cellPointer = nullptr;
 	CellNode<int, vector<char>> cellNode;
-	CellNode<int, Cell<vector<char>>> masterCell;
+	vector<CellNode<int, vector<char>>> cellNodeList = vector<CellNode<int, vector<char>>>();
 	while (!cin.eof()) {
+		count = 0;
 		//Read in the first values
 		cin >> info;
 		cin.get(comma);
@@ -344,7 +363,6 @@ int main() {
 		cin.get(blank);
 		//Read in the values
 		do {
-			value.empty();
 			cin.get(c);
 			//While there is a valid character read it in
 			while ((c != ' ') && (c != '\n') && (!cin.eof())) {
@@ -353,22 +371,29 @@ int main() {
 			}
 			//If there is a space and a value has been read
 			if (value.getSize() >= 1) {
-				valueList.add(value);
+				valueList.add(value); 
+				value.empty();
 			}
 		} while ((c != '\n') && (!cin.eof()));
+		if (cin.eof()) break;
 		//End of line
-		//Create a cell node
-		cell = Cell<vector<char>>(&valueList[noItems - 1], 0);
-		cellPointer = &cell;
-		for (int i = noItems-2; i >= 0; i--) {
-			cell = Cell<vector<char>>(&valueList[i], cellPointer);
-			cellPointer = &cell;
+		//Create cells and cell nodes
+		if (count == 0) {
+			Cell<vector<char>>* cell = new Cell<vector<char>>(&valueList[noItems-1], 0);
+			cellPointer = cell;
+			count++;
 		}
-		cellNode = CellNode<int, vector<char>>(&info, cellPointer);
+		for (int i = noItems - 2; i >= 0; i--) {
+			Cell<vector<char>>* cell = new Cell<vector<char>>(&valueList[i], cellPointer);
+			cellPointer = cell;
+		}
+		CellNode<int, vector<char>>* cellNode = new CellNode<int, vector<char>>(&info, cellPointer);
+		cellNodeList.add(*cellNode);
+		valueList.empty();
 	}
 	//End of file
-	//Create a master cell
-//	cout << valueList[0] << ' ' << valueList[1] << ' ' << valueList[2] << ' ' << valueList[3] << ' ' << endl;
+	//Add the cell nodes to the master cell
+	MasterCell<int, vector<char>> masterCell = MasterCell<int, vector<char>>(cellNodeList.toArray());
 	return 0;
 }
 
