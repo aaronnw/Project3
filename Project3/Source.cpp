@@ -88,7 +88,7 @@ public:
 	MasterCell(vector<CellNode<DT1, DT2>> cn);//Initializer
 	MasterCell(const MasterCell<DT1, DT2>& mc);//Copy constructor
 	~MasterCell();//Destructor
-	void addCellNode(CellNode<DT1, DT2> cn);
+	void addCellNode(DT1* info, Cell<DT2>* cell);
 	void operator= (const MasterCell<DT1, DT2>& mc);//Overloaded assignment operator
 	CellNode<DT1, DT2>* getCellNodes();
 	int getNumNodes();
@@ -341,9 +341,15 @@ MasterCell<DT1, DT2>::~MasterCell() {
 }
 
 template<class DT1, class DT2>
-void MasterCell<DT1, DT2>::addCellNode(CellNode<DT1, DT2> cn) {
-	_myCellNodes[numNodes] = cn;
+void MasterCell<DT1, DT2>::addCellNode(DT1* info, Cell<DT2>* cell) {
+	CellNode<DT1, DT2>* tmp = _myCellNodes;
+	_myCellNodes = new CellNode<DT1, DT2>[numNodes + 1];
+	for (int i = 0; i < numNodes; ++i) {
+		_myCellNodes[i] = tmp[i];
+	}
+	_myCellNodes[numNodes] = CellNode<vector<char>, vector<char>>(info, cell);
 	numNodes++;
+	delete[] tmp;
 }
 
 template<class DT1, class DT2>
@@ -392,23 +398,19 @@ ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int main() {
-	vector<char> info;
 	char blank = ' ';
 	char comma = ',';
 	int noItems;
 	char c;
 	int count = 0;
-	vector<char> value;
-	CellNode< vector<char>, vector<char>>* cellNode = new CellNode< vector<char>, vector<char>>();
-	vector<CellNode< vector<char>, vector<char>>> cellNodeList = vector<CellNode< vector<char>, vector<char>>>();
-	MasterCell<vector<char>, vector<char>> masterCell = vector<CellNode< vector<char>, vector<char>>>(); 
+	MasterCell<vector<char>, vector<char>> masterCell; 
 	while (!cin.eof()) {
 		Cell<vector<char>>* previousCell = new Cell<vector<char>>();
 		vector<char>* info = new vector<char>;
 		count = 0;
 		//Read in the first values
 		cin.get(c);
-		while (c != ',') {
+		while (c != ',' && !cin.eof()) {
 			(*info).add(c);
 			cin.get(c);
 		}
@@ -429,8 +431,12 @@ int main() {
 			if ((*value).getSize() >= 1) {
 				Cell<vector<char>>* cell = new Cell<vector<char>>(value);
 				if (count == 0) {
-					cellNode = new CellNode< vector<char>, vector<char>>(info, cell);
+					masterCell.addCellNode(info, cell);
+					/*
+					Formerly
+					cellNode = new CellNode<vector<char>, vector<char>>(info, cell);
 					masterCell.addCellNode(*cellNode);
+					*/
 					previousCell = cell;
 					count++;
 				}
@@ -447,8 +453,6 @@ int main() {
 		if (cin.eof()) break;
 	}
 	//End of file
-	//Add the cell nodes to the master cell
-
  	cout << masterCell;
 	return 0;
 }
