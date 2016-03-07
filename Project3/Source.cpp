@@ -361,21 +361,24 @@ ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 int main() {
-	int info;
+	vector<char> info;
 	char blank = ' ';
 	char comma = ',';
 	int noItems;
 	char c;
 	int count = 0;
 	vector<char> value;
-	CellNode<int, vector<char>>* cellNode = new CellNode<int, vector<char>>();
-	vector<CellNode<int, vector<char>>> cellNodeList = vector<CellNode<int, vector<char>>>();
+	CellNode< vector<char>, vector<char>>* cellNode = new CellNode< vector<char>, vector<char>>();
+	vector<CellNode< vector<char>, vector<char>>> cellNodeList = vector<CellNode< vector<char>, vector<char>>>();
 	while (!cin.eof()) {
 		Cell<vector<char>>* previousCell = new Cell<vector<char>>();
 		count = 0;
 		//Read in the first values
-		cin >> info;
-		cin.get(comma);
+		cin.get(c);
+		while (c != ',') {
+			info.add(c);
+		}
+	//	cin.get(comma);
 		cin.get(blank);
 		cin >> noItems;
 		cin.get(blank);
@@ -392,7 +395,7 @@ int main() {
 			if ((*value).getSize() >= 1) {
 				Cell<vector<char>>* cell = new Cell<vector<char>>(value);
 				if (count == 0) {
-					cellNode = new CellNode<int, vector<char>>(&info, cell);
+					cellNode = new CellNode< vector<char>, vector<char>>(&info, cell);
 					cellNodeList.add(*cellNode);
 					previousCell = cell;
 					count++;
@@ -412,7 +415,7 @@ int main() {
 	}
 	//End of file
 	//Add the cell nodes to the master cell
-	MasterCell<int, vector<char>> masterCell = MasterCell<int, vector<char>>(cellNodeList.toArray());
+	MasterCell< vector<char>, vector<char>> masterCell = MasterCell< vector<char>, vector<char>>(cellNodeList.toArray());
 	return 0;
 }
 
