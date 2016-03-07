@@ -227,6 +227,8 @@ ostream& operator<< (ostream& s, vector<T>& ac) {
 
 template<class DT>
 Cell<DT>::Cell() {
+	DT* _value = nullptr;
+	Cell<DT>* _right = nullptr;
 }
 
 template<class DT>
@@ -279,6 +281,8 @@ void Cell<DT>::setRight(Cell<DT>* cellPointer) {
 ///Default constructor
 template<class DT1, class DT2>
 CellNode<DT1, DT2>::CellNode() {
+	DT1* _info = nullptr; //The info for the cell node
+	Cell<DT2>* _myCell = nullptr;  //Pointer to the first cell
 }
 ///Initializer
 template<class DT1, class DT2>
@@ -319,6 +323,7 @@ void CellNode<DT1, DT2>::operator=(const CellNode<DT1, DT2>& cn) {
 template<class DT1, class DT2>
 MasterCell<DT1, DT2>::MasterCell() {
 	numNodes = 0;
+	CellNode<DT1, DT2>*	_myCellNodes = nullptr;
 }
 
 template<class DT1, class DT2>
@@ -399,7 +404,6 @@ ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc) {
 
 int main() {
 	char blank = ' ';
-	char comma = ',';
 	int noItems;
 	char c;
 	int count = 0;
@@ -432,11 +436,6 @@ int main() {
 				Cell<vector<char>>* cell = new Cell<vector<char>>(value);
 				if (count == 0) {
 					masterCell.addCellNode(info, cell);
-					/*
-					Formerly
-					cellNode = new CellNode<vector<char>, vector<char>>(info, cell);
-					masterCell.addCellNode(*cellNode);
-					*/
 					previousCell = cell;
 					count++;
 				}
@@ -454,30 +453,44 @@ int main() {
 	}
 	//End of file
  	cout << masterCell;
+	///Call the methods for each class to demonstrate that they work
+	//Cell
+	/*
+		friend ostream& operator<< (ostream& s, Cell<T>& c); //Overloaded ostream operator
+		Cell(); //Default constructor
+		Cell(DT* v, Cell<DT>* r);//Initializer
+		Cell(DT* v, int i);//Initializer
+		Cell(DT* v); //Initializer
+		Cell(const Cell<DT>& c);//Copy constructor
+		~Cell();//Destructor
+		void operator= (const Cell<DT>& c);//Overloaded assignment operator
+		Cell<DT>* getRight();
+		void setRight(Cell<DT>* cellPointer);
+	*/
+	//CellNode
+	/*
+		friend ostream& operator<< (ostream& s, CellNode<DT1, DT2>& cn); //Overloaded ostream operator
+		CellNode();//Default constructor
+		CellNode(DT1* i, Cell<DT2>* c);//Initializer
+		CellNode(const CellNode<DT1, DT2>& cn);//Copy constructor
+		~CellNode();//Destructor
+		Cell<DT2>* getFirstCell();
+		DT1* getInfo();
+		void operator= (const CellNode<DT1, DT2>& c);//Overloaded assignment operator
+	*/
+
+	// MasterCell
+	/*
+		friend ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc); //Overloaded ostream operator
+		MasterCell();//Default constructor
+		MasterCell(CellNode<DT1, DT2>* cn);//Initializer
+		MasterCell(vector<CellNode<DT1, DT2>> cn);//Initializer
+		MasterCell(const MasterCell<DT1, DT2>& mc);//Copy constructor
+		~MasterCell();//Destructor
+		void addCellNode(DT1* info, Cell<DT2>* cell);
+		void operator= (const MasterCell<DT1, DT2>& mc);//Overloaded assignment operator
+		CellNode<DT1, DT2>* getCellNodes();
+		int getNumNodes();
+	*/
 	return 0;
 }
-
-
-/* example
-int value = 34;
-int* pointerToValue = &value;-
-Cell<int> newCell(pointerToValue);
-cout << newCell << endl;
-*/
-
-/*
-Create	all	the	required	data	structures	along	with	the	implementation	of	each	of	the
-following	methods	for	all	classes. You	are	required	to	demonstrate	the	working	of	the	following
-methods	for	each	of	the	methods	by	invoking	them	from	a	main	program.
-a. empty	constructor
-b. non-empty	constructor (sets	the	initial	size	of	the	vector)
-c. destructor
-d. copy	constructor
-e. overloaded	equal to operator
-f. ostream operatro
-*/
-/*
-Read	the	redirected	input	and	create	all	the	data	structures.
-Demonstrate	the	working	of	the	classes	with	two	different	data	types:	int	and	character
-strings.
-*/
