@@ -42,8 +42,6 @@ protected:
 public:
 	//All	required	methods	
 	Cell(); //Default constructor
-	Cell(DT* v, Cell<DT>* r);//Initializer
-	Cell(DT* v, int i);//Initializer
 	Cell(DT* v); //Initializer
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
@@ -235,18 +233,6 @@ template<class DT>
 Cell<DT>::Cell(DT* v) {
 	_value = v;
 	_right = nullptr;
-}
-
-template<class DT>
-Cell<DT>::Cell(DT* v, Cell<DT>* r) {
-	_value = v;
-	_right = r;
-}
-
-template<class DT>
-Cell<DT>::Cell(DT * v, int i) {
-	_right = nullptr;
-	_value = v;
 }
 
 template<class DT>
@@ -454,6 +440,7 @@ int main() {
 	//End of file
  	cout << masterCell;
 	///Call the methods for each class to demonstrate that they work
+	//	Demonstrate	the	working	of the classes with	two	different data types: int and character strings.
 	//Cell
 	/*
 		friend ostream& operator<< (ostream& s, Cell<T>& c); //Overloaded ostream operator
@@ -467,6 +454,8 @@ int main() {
 		Cell<DT>* getRight();
 		void setRight(Cell<DT>* cellPointer);
 	*/
+//	Cell emptyCell = Cell();
+	
 	//CellNode
 	/*
 		friend ostream& operator<< (ostream& s, CellNode<DT1, DT2>& cn); //Overloaded ostream operator
