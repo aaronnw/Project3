@@ -1,6 +1,8 @@
 # include <iostream>
 using namespace std;
 
+class incorrectInputError {};
+
 template<class DT>
 class vector {
 	template<class T>
@@ -42,10 +44,12 @@ public:
 	Cell(); //Default constructor
 	Cell(DT* v, Cell<DT>* r);//Initializer
 	Cell(DT* v, int i);//Initializer
+	Cell(DT* v); //Initializer
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
 	void operator= (const Cell<DT>& c);//Overloaded assignment operator
 	Cell<DT>* getRight();
+	void setRight(Cell<DT>* cellPointer);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +225,12 @@ Cell<DT>::Cell() {
 }
 
 template<class DT>
+Cell<DT>::Cell(DT* v) {
+	_value = v;
+	_right = nullptr;
+}
+
+template<class DT>
 Cell<DT>::Cell(DT* v, Cell<DT>* r) {
 	_value = v;
 	_right = r;
@@ -234,8 +244,8 @@ Cell<DT>::Cell(DT * v, int i) {
 
 template<class DT>
 Cell<DT>::Cell(const Cell<DT>& c) {
-	_value = *c._value;
-	_right = *c._right;
+	_value = c._value;
+	_right = c._right;
 }
 
 template<class DT>
@@ -251,6 +261,11 @@ void Cell<DT>::operator=(const Cell<DT>& c) {
 template<class DT>
 Cell<DT>* Cell<DT>::getRight() {
 	return _right;
+}
+
+template<class DT>
+void Cell<DT>::setRight(Cell<DT>* cellPointer) {
+	_right = cellPointer;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -326,12 +341,17 @@ ostream& operator<< (ostream& s, Cell<T>& c) {
 	return s;
 
 }
+
 template<class T1, class T2>
 ostream& operator<< (ostream& s, CellNode<T1, T2>& cn) {
-	s << *cn.getInfo() << ', ';
-	s << *cn.getFirstCell();
+	s << *cn.getInfo() << ',' << ' ';
+	for(Cell<vector<char>>* cell = (cn.getFirstCell()) ; cell != nullptr; cell = ((*cell).getRight())){
+		s << *cell << ' ';
+	}
+	s << endl;
 	return s;
 }
+
 template<class T1, class T2>
 ostream& operator<< (ostream& s, MasterCell<T1, T2>& mc) {
 	return s;
@@ -348,12 +368,10 @@ int main() {
 	char c;
 	int count = 0;
 	vector<char> value;
-	vector<vector<char>> valueList;
-	Cell<vector<char>> cell;
-	Cell<vector<char>>* cellPointer = nullptr;
-	CellNode<int, vector<char>> cellNode;
+	CellNode<int, vector<char>>* cellNode = new CellNode<int, vector<char>>();
 	vector<CellNode<int, vector<char>>> cellNodeList = vector<CellNode<int, vector<char>>>();
 	while (!cin.eof()) {
+		Cell<vector<char>>* previousCell = new Cell<vector<char>>();
 		count = 0;
 		//Read in the first values
 		cin >> info;
@@ -363,34 +381,34 @@ int main() {
 		cin.get(blank);
 		//Read in the values
 		do {
+			vector<char>* value = new vector<char>();
 			cin.get(c);
 			//While there is a valid character read it in
 			while ((c != ' ') && (c != '\n') && (!cin.eof())) {
-				value.add(c);
+				(*value).add(c);
 				cin.get(c);
 			}
 			//If there is a space and a value has been read
-			if (value.getSize() >= 1) {
-				valueList.add(value); 
-				value.empty();
+			if ((*value).getSize() >= 1) {
+				Cell<vector<char>>* cell = new Cell<vector<char>>(value);
+				if (count == 0) {
+					cellNode = new CellNode<int, vector<char>>(&info, cell);
+					cellNodeList.add(*cellNode);
+					previousCell = cell;
+					count++;
+				}
+				else{
+					(*previousCell).setRight(cell);
+					previousCell = cell;
+				}
+			}
+			else {
+				break;
 			}
 		} while ((c != '\n') && (!cin.eof()));
 		if (cin.eof()) break;
 		//End of line
-		//Create cells and cell nodes
-		if (count == 0) {
-			Cell<vector<char>>* cell = new Cell<vector<char>>(&valueList[noItems-1], 0);
-			cellPointer = cell;
-			count++;
-		}
-		for (int i = noItems - 2; i >= 0; i--) {
-			Cell<vector<char>>* cell = new Cell<vector<char>>(&valueList[i], cellPointer);
-			cellPointer = cell;
-
-		}
-		CellNode<int, vector<char>>* cellNode = new CellNode<int, vector<char>>(&info, cellPointer);
-		cellNodeList.add(*cellNode);
-		valueList.empty();
+		cout << *cellNode;
 	}
 	//End of file
 	//Add the cell nodes to the master cell
@@ -414,8 +432,8 @@ a. empty	constructor
 b. non-empty	constructor (sets	the	initial	size	of	the	vector)
 c. destructor
 d. copy	constructor
-e. overloaded	equal	to	operator
-f. ostream operator
+e. overloaded	equal to operator
+f. ostream operatro
 */
 /*
 Read	the	redirected	input	and	create	all	the	data	structures.
