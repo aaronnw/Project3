@@ -1,8 +1,6 @@
 # include <iostream>
 using namespace std;
-
-class incorrectInputError {};
-
+///Vector class to create and manage resizable arrays
 template<class DT>
 class vector {
 	template<class T>
@@ -19,19 +17,18 @@ public:
 	vector(const vector<DT>& ac); // Copy constructor
 	~vector(); // Destructor
 	void operator= (const vector<DT>& ac); //Overloaded assignment operator
-	DT& operator[](int i);
-	DT* toArray();
-	void add(DT& x);
-	void insertAt(int i, DT& x);
-	void removeAt(int i);
-	void expand();
-	void empty();
-	int getCapacity();
-	int getSize();
+	DT& operator[](int i); //Overloaded [] operator
+	void add(DT& x); //Adds a new datatype
+	void insertAt(int i, DT& x); //Insert an element at a given index
+	void removeAt(int i); //Remove an element at a given index
+	void expand(); //Expand the array capacity
+	void empty(); //Empty the array
+	int getCapacity(); //Return the array capacity
+	int getSize(); //Return the array size
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
+///Cell object holding a pointer to a value and a pointer to another cell
 template <class	DT>
 class Cell{
 	template<class T>
@@ -40,18 +37,18 @@ protected:
 	DT* _value;	//Value stored in the cell
 	Cell<DT>* _right; //Pointer to the next cell
 public:
-	//All	required	methods	
+	//All required methods	
 	Cell(); //Default constructor
 	Cell(DT* v); //Initializer
 	Cell(const Cell<DT>& c);//Copy constructor
 	~Cell();//Destructor
 	void operator= (const Cell<DT>& c);//Overloaded assignment operator
-	Cell<DT>* getRight();
-	void setRight(Cell<DT>* cellPointer);
+	Cell<DT>* getRight(); //Return the pointer to the right cell
+	void setRight(Cell<DT>* cellPointer); //Set the pointer to the right cell
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
+///Cell node holding a pointer to an info object and a pointer to the first cell
 template <class	DT1, class	DT2>
 class CellNode {
 	template<class T1, class T2>
@@ -60,18 +57,18 @@ protected:
 	DT1* _info; //The info for the cell node
 	Cell<DT2>* _myCell;  //Pointer to the first cell
 public:
-	//All	required	methods	
+	//All required methods	
 	CellNode();//Default constructor
 	CellNode(DT1* i, Cell<DT2>* c);//Initializer
 	CellNode(const CellNode<DT1, DT2>& cn);//Copy constructor
 	~CellNode();//Destructor
-	Cell<DT2>* getFirstCell();
-	DT1* getInfo();
+	Cell<DT2>* getFirstCell(); //Return a pointer to the first cell
+	DT1* getInfo(); //Return a pointer to the info
 	void operator= (const CellNode<DT1, DT2>& c);//Overloaded assignment operator
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
+///Master cell holding a vector list of cell nodes
 template <class	DT1, class	DT2>
 class MasterCell {
 	template<class T1, class T2>
@@ -80,15 +77,15 @@ protected:
 	CellNode<DT1, DT2>*	_myCellNodes;
 	int numNodes;
 public:
-	//All	required	methods
+	//All required methods
 	MasterCell();//Default constructor
 	MasterCell(CellNode<DT1, DT2> cn);//Initializer
 	MasterCell(const MasterCell<DT1, DT2>& mc);//Copy constructor
 	~MasterCell();//Destructor
-	void addCellNode(DT1* info, Cell<DT2>* cell);
+	void addCellNode(DT1* info, Cell<DT2>* cell); //Add a cell node to the master cell
 	void operator= (const MasterCell<DT1, DT2>& mc);//Overloaded assignment operator
-	CellNode<DT1, DT2>* getCellNodes();
-	int getNumNodes() const;
+	CellNode<DT1, DT2>* getCellNodes(); //Return a pointer to the first cell node
+	int getNumNodes() const; //Return the number of nodes in the master cell
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -138,11 +135,6 @@ template<class DT>
 DT & vector<DT>::operator[](int i) {
 	//TODO if ((i < 0) || (i >= (capacity - 1))) throw errors;
 	return arrayOfDT[i];
-}
-
-template<class DT>
-DT * vector<DT>::toArray() {
-	return arrayOfDT;
 }
 ///Add an element to the end of the array
 template<class DT>
@@ -428,13 +420,17 @@ int main() {
 			}
 			//If there is a space and a value has been read
 			if ((*value).getSize() >= 1) {
+				//Create a new cell with the value
 				Cell<vector<char>>* cell = new Cell<vector<char>>(value);
+				//Only run for the first cell information in a line
 				if (count == 0) {
+					//Add the cell and the info to the master cell, which will create a cell node
 					masterCell.addCellNode(info, cell);
 					previousCell = cell;
 					count++;
 				}
 				else {
+					//Give the previous cell a pointer to the new cell
 					(*previousCell).setRight(cell);
 					previousCell = cell;
 				}
@@ -447,6 +443,7 @@ int main() {
 		if (cin.eof()) break;
 	}
 	//End of file
+	cout << "Single master cell object created from input" << endl << "Each line is a cell node, followed by all of its contained cells" << endl << endl;
 	cout << masterCell << endl;
 
 
